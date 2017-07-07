@@ -7,7 +7,7 @@
     }
 
 
-function mergeArr(arr) {
+function arrSerialize(arr) {
 	var res = [];
 	if (isObject(arr)) {
 		return;
@@ -15,9 +15,9 @@ function mergeArr(arr) {
 	if (isArray(arr)) {
 		for (var i = 0;i<arr.length;i++) {
 			if (isArray(arr[i])) {
-				res.push(mergeArr(arr[i]));
+				res.push(arrSerialize(arr[i]));
 			} else {
-				res.push(mergeObj(arr[i]));
+				res.push(objSerialize(arr[i]));
 			}
 			
 		}
@@ -25,14 +25,16 @@ function mergeArr(arr) {
 	} else {
 		if (typeof arr === 'string') {
 			return '"'+arr+'"';
-		} else {
+		} else if (typeof arr === 'boolean' || arr === null || typeof arr === 'number'){
 			return arr;
+		} else {
+			throw new Error('arguments error');
 		}
 	}
 		
 }
 
-function mergeObj(obj) {
+function objSerialize(obj) {
 	var res = [];
 	if (isArray(obj)) {
 		return;
@@ -40,9 +42,9 @@ function mergeObj(obj) {
 	if (isObject(obj)) {
 		for (var key in obj) {
 			if (isObject(obj[key])) {
-				res.push('"'+key+'"'+":"+mergeObj(obj[key]));
+				res.push('"'+key+'"'+":"+objSerialize(obj[key]));
 			} else {
-				res.push('"'+key+'"'+":"+mergeArr(obj[key]));
+				res.push('"'+key+'"'+":"+arrSerialize(obj[key]));
 			}
 			
 		}
@@ -50,22 +52,24 @@ function mergeObj(obj) {
 	} else {
 		if (typeof obj === 'string') {
 			return '"'+obj+'"';
-		} else {
+		} else if (typeof obj === 'boolean' || obj === null || typeof obj === 'number'){
 			return obj;
+		} else {
+			throw new Error('arguments error');
 		}
 	}
 		
 }
-JSON = {
+MYJSON = {
 	stringify: function(arg) {
 		if (isObject(arg)) {
-			return mergeObj(arg);
+			return objSerialize(arg);
 		} else if (isArray(arg)){
-			return mergeArr(arg)
+			return arrSerialize(arg)
 		}
 	}
 }
-console.log(JSON.stringify({
+console.log(MYJSON.stringify({
       "Image": {
           "Width":  800,
           "Height": 600,
@@ -77,4 +81,3 @@ console.log(JSON.stringify({
           },
           "IDs": [116, 943, 234, 38793]}})
 )
-
